@@ -1,0 +1,7 @@
+pluginManagement {
+    plugins {
+        id "com.github.johnrengelman.shadow" version shadowJarVersion
+    }
+}
+
+rootProject.name = 'battle-of-the-jits'
