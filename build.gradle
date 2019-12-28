@@ -13,12 +13,6 @@ dependencies {
 
     // This dependency is used by the annotation processor.
     annotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:$jmhVersion"
-
-    // Use JUnit Jupiter API for testing.
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-
-    // Use JUnit Jupiter Engine for testing.
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
 
 jar {
@@ -31,10 +25,6 @@ shadowJar {
     archiveBaseName = "benchmarks"
     archiveClassifier = null
     archiveVersion = null
-}
-
-test {
-    useJUnitPlatform()
 }
 
 // If you run Gradle without tasks, then run these tasks

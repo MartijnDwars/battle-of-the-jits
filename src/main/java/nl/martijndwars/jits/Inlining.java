@@ -1,5 +1,8 @@
-/**
+/*
  * See https://shipilev.net/jvm/anatomy-quarks/16-megamorphic-virtual-calls/
+ *
+ * This benchmark creates an artificial monomorphic resp. megamorphic call site. This is possible
+ * in Java, because subtyping makes it impossible to determine the concrete method until runtime.
  */
 package nl.martijndwars.jits;
 
@@ -47,6 +50,7 @@ public class Inlining {
   
   @Setup
   public void setup() {
+    /* fill as with c1, c2, c3, c1, c2, ... */
     as = new A[300];
     boolean mega = mode.equals("mega");
     for (int c = 0; c < 300; c += 3) {
