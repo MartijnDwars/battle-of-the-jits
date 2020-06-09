@@ -1,26 +1,39 @@
 #!/usr/bin/env bash
 
+# Stop execution if a command or pipeline has an error
+set -e
+
 JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_231.jdk/Contents/Home
-GRAAL_HOME=/Library/Java/JavaVirtualMachines/graalvm-ee-19.2.1/Contents/Home
+G1921_HOME=/Library/Java/JavaVirtualMachines/graalvm-ee-19.2.1/Contents/Home
+G2000_HOME=/Library/Java/JavaVirtualMachines/graalvm-ee-java8-20.0.0/Contents/Home
+JAR=build/libs/benchmarks.jar
 
 # Compile and assemble a fat JAR
 ./gradlew clean shadowJar
 
 # Escape
-$GRAAL_HOME/bin/java -jar build/libs/benchmarks.jar Escape --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation" -prof dtraceasm
-#$JAVA_HOME/bin/java -jar build/libs/benchmarks.jar Escape --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation"
+#$G1921_HOME/bin/java -jar $JAR Escape --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation" -prof dtraceasm
+#$JAVA_HOME/bin/java -jar $JAR Escape --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation"
 
 # Inlining
-#$GRAAL_HOME/bin/java -jar build/libs/benchmarks.jar Inlining --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation" -prof gc
-#$JAVA_HOME/bin/java -jar build/libs/benchmarks.jar Inlining --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation" -prof gc
+#$G1921_HOME/bin/java -jar $JAR Inlining --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation" -pmode=mega -prof dtraceasm
+#$JAVA_HOME/bin/java -jar $JAR Inlining --jvmArgsAppend="-XX:LoopUnrollLimit=1 -XX:-TieredCompilation" -pmode=mega -prof dtraceasm
 
-# Symbolic
-#$GRAAL_HOME/bin/java -jar build/libs/benchmarks.jar Symbolic.simpleRandom --jvmArgsAppend="-XX:LoopUnrollLimit=0 -XX:-TieredCompilation -XX:-UseCompressedOops" -prof dtraceasm
-#$JAVA_HOME/bin/java -jar build/libs/benchmarks.jar Symbolic.simpleRandom --jvmArgsAppend="-XX:LoopUnrollLimit=0 -XX:-TieredCompilation -XX:-UseCompressedOops" -prof dtraceasm
+# Dataflow
+#$G1921_HOME/bin/java -jar $JAR Dataflow.random # --jvmArgsAppend="-XX:LoopUnrollLimit=0 -XX:-TieredCompilation -XX:-UseCompressedOops" -prof dtraceasm
+#$JAVA_HOME/bin/java -jar $JAR Dataflow.random # --jvmArgsAppend="-XX:LoopUnrollLimit=0 -XX:-TieredCompilation -XX:-UseCompressedOops" -prof dtraceasm
 
-# DataFlow
-#$GRAAL_HOME/bin/java -jar build/libs/benchmarks.jar DataFlow.single -prof dtraceasm
-#$JAVA_HOME/bin/java -jar build/libs/benchmarks.jar DataFlow.single -prof dtraceasm
+# Escape
+#$G1921_HOME/bin/java -jar $JAR Escape.split -prof dtraceasm
+#$JAVA_HOME/bin/java -jar $JAR Escape.split -prof dtraceasm
+
+# Vectorization
+#$JAVA_HOME/bin/java -jar $JAR Vectorization.decodeAscii -prof dtraceasm
+$G2000_HOME/bin/java -jar $JAR Vectorization.reduceBoolean -prof dtraceasm
+
+
+
+
 
 # JVM flags explanation:
 # -XX:LoopUnrollLimit=1: this will block loop unrolling from complicating the disssembly.

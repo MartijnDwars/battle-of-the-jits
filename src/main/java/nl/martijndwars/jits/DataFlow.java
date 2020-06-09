@@ -73,9 +73,12 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Benchmark)
-public class DataFlow {
-  @Benchmark // 70ns on Graal, 2362ns on C2. Same behavior when you replace the condition by `circle.r * 2 > 2`
-  public int simpleRandom() {
+public class Dataflow {
+  /**
+   * Graal's data flow analysis discovers that the condition `r > 1` can never be true.
+   */
+  @Benchmark
+  public int random() {
     Random random = new Random();
     int sum = 0;
     
@@ -90,23 +93,7 @@ public class DataFlow {
     return sum;
   }
   
-  @Benchmark // 70ns on Graal, 2362ns on C2. Same behavior when you replace the condition by `circle.r * 2 > 2`
-  public int random() {
-    Random random = new Random();
-    int sum = 0;
-    
-    for (int i = 0; i < 256; i++) {
-      Circle circle = new Circle(random.nextInt(2)); // Random values are always in [0, 1]
-      
-      if (circle.r > 1) { // This is always false
-        sum += circle.r;
-      }
-    }
-    
-    return sum;
-  }
-  
-  @Benchmark // 436ns on Graal, 2594ns on C2
+  @Benchmark // 436ns on Graal, 2594ns on C2. Why is Graal 5x faster?
   public int halfRandom() {
     Random random = new Random();
     int sum = 0;
@@ -114,7 +101,7 @@ public class DataFlow {
     for (int i = 0; i < 256; i++) {
       Circle circle = new Circle(random.nextInt(2)); // Random values are always in [0, 1]
       
-      if (circle.r > 0) { // This is always false
+      if (circle.r > 0) { // This is half of the time false
         sum += circle.r;
       }
     }
